@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Word Definition</title>
+  </head>
+  <body
+    style="
+      font-family: 'Arial', sans-serif;
+      background-color: #f9f5f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    "
+  >
+    <div
+      id="container"
+      style="
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        width: 80%;
+        max-width: 600px;
+        text-align: center;
+      "
+    >
+      <h1 style="color: #e44d26; margin-bottom: 25px">Enter a Word</h1>
+
+      <div id="input-section" style="margin-bottom: 20px">
+        <input
+          type="text"
+          id="word-input"
+          placeholder="Enter word here"
+          style="
+            padding: 12px 20px;
+            width: 70%;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 10s;
+          "
+        />
+        <button
+          onclick="submitWord()"
+          style="
+            background-color: #e44d26;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-left: 10px;
+          "
+        >
+          Submit
+        </button>
+      </div>
+
+      <div
+        id="response-section"
+        style="display: none; text-align: left; margin-top: 30px"
+      >
+        <h2
+          style="
+            color: #e44d26;
+            border-bottom: 2px solid #e44d26;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+          "
+        >
+          Definition
+        </h2>
+        <p>
+          <strong style="color: #555">Word:</strong> <span id="word"></span>
+        </p>
+        <p>
+          <strong style="color: #555">Definition 1:</strong>
+          <span id="definition1"></span>
+        </p>
+        <p>
+          <strong style="color: #555">Definition 2:</strong>
+          <span id="definition2"></span>
+        </p>
+        <p>
+          <strong style="color: #555">Example:</strong>
+          <span id="example"></span>
+        </p>
+        <p>
+          <strong style="color: #555">Synonyms:</strong>
+          <span id="synonyms"></span>
+        </p>
+        <p>
+          <strong style="color: #555">Antonyms:</strong>
+          <span id="antonyms"></span>
+        </p>
+
+        <button
+          onclick="goBack()"
+          style="
+            background-color: #e44d26;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+          "
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+
+    <script>
+      async function submitWord() {
+        const word = document.getElementById("word-input").value;
+        // Here you would normally send the word to the server
+        // For this example, we'll use a mock response
+
+        const mockResponse = {
+          word: word,
+          definition1: "A word used to describe something.",
+          definition2: "Another possible meaning.",
+          example: "An example of the word in use.",
+          synonyms: ["similar", "alike"],
+          antonyms: ["different", "opposite"],
+        };
+
+        displayResponse(mockResponse);
+      }
+
+      function displayResponse(response) {
+        document.getElementById("word").innerText = response.word;
+        document.getElementById("definition1").innerText = response.definition1;
+        document.getElementById("definition2").innerText =
+          response.definition2 || "N/A";
+        document.getElementById("example").innerText = response.example;
+        document.getElementById("synonyms").innerText = response.synonyms
+          ? response.synonyms.join(", ")
+          : "N/A";
+        document.getElementById("antonyms").innerText = response.antonyms
+          ? response.antonyms.join(", ")
+          : "N/A";
+
+        document.getElementById("input-section").style.display = "none";
+        document.getElementById("response-section").style.display = "block";
+      }
+
+      function goBack() {
+        document.getElementById("input-section").style.display = "block";
+        document.getElementById("response-section").style.display = "none";
+        document.getElementById("word-input").value = ""; // Clear input
+      }
+    </script>
+  </body>
+</html>
