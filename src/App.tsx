@@ -62,7 +62,7 @@ function App() {
       // const result = {
       //   data: {
       //     word: "apple",
-      //     definition1: "a round fruit",
+      //     definition1: "a round fruvvvvvvvvvvvvvvvvvit",
       //     definition2: "the tree ",
       //     example: "He picked an apple from the tree.",
       //     synonyms: "fruit, pome",
@@ -76,6 +76,20 @@ function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const renderSynonymsAntonyms = (label: string, items: string) => {
+    return items.length < 20 ? (
+      <Row>
+        <Key>{label}:</Key>
+        <Value>{items}</Value> {/* 문자열 그대로 출력 */}
+      </Row>
+    ) : (
+      <LongRow>
+        <Key>{label}:</Key>
+        <Value>{items}</Value> {/* 문자열 그대로 출력 */}
+      </LongRow>
+    );
   };
 
   return (
@@ -119,7 +133,12 @@ function App() {
                 <Key>Example:</Key>
                 <Value>{result.example}</Value>
               </LongRow>
-              {result.synonyms?.length !== undefined &&
+
+              {result.synonyms &&
+                renderSynonymsAntonyms("Synonyms", result.synonyms)}
+              {result.antonyms &&
+                renderSynonymsAntonyms("Antonyms", result.antonyms)}
+              {/* {result.synonyms?.length !== undefined &&
               result.synonyms.length < 20 ? (
                 <Row>
                   <Key>Synonyms:</Key>
@@ -142,7 +161,7 @@ function App() {
                   <Key>Antonyms:</Key>
                   <Value>{result.antonyms}</Value>
                 </LongRow>
-              )}
+              )} */}
             </RowsContainer>
             <ConfirmButton onClick={onConfirm}>Confirm</ConfirmButton>
           </ResponseSection>
@@ -304,6 +323,7 @@ const Key = styled.span`
   font-weight: 700;
   /* font-weight: bold; */
   color: #555;
+  flex-shrink: 0;
 `;
 const Value = styled.span`
   font-size: 14px;
