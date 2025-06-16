@@ -2,30 +2,38 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import styled from "styled-components";
 
 import loadingImage from "./assets/loading.gif";
-import { getDefinition } from "./api";
-
-interface Result {
-  word: string;
-  definition1: string;
-  definition2: string | null;
-  example: string;
-  synonyms: string | null;
-  antonyms: string | null;
-}
+import { getDefinition, saveToNotion } from "./api";
+import { Result } from "./interface";
 
 function App() {
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState("");
   const [result, setResult] = useState<Result | null>();
+  // const [definition, setDefinition] = useState("");
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   };
 
-  const onConfirm = () => {
+  const onSave = async () => {
     // 부드러운 전환을 위해 상태 초기화를 약간 지연시킬 수 있지만, 여기서는 즉시 실행합니다.
-    setResult(null);
-    setValue("");
+    if (!result) {
+      console.error("저장할 데이터가 없습니다.");
+      return;
+    } // 결과가 없으면 저장하지 않음
+    setLoading(true);
+    try {
+      const response = await saveToNotion(result);
+      console.log("Saved to Notion:", response);
+    } catch (error) {
+      console.error("Error saving to Notion:", error);
+      // 사용자에게 에러 피드백을 주는 UI를 추가할 수도 있습니다.
+      alert("Could not save the definition to Notion.");
+    } finally {
+      setLoading(false);
+      setResult(null);
+      setValue("");
+    }
   };
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -49,7 +57,7 @@ function App() {
       <Container>
         {!loading && !result && (
           <InputSection>
-            <Title>Dictionary</Title>
+            <Title>Notionary</Title>
             <Form onSubmit={onSubmit}>
               <Input
                 type="text"
@@ -100,7 +108,14 @@ function App() {
               )}
             </RowsContainer>
             <ButtonContainer>
-              <ConfirmButton onClick={onConfirm}>Search Another</ConfirmButton>
+              <SecondaryButton
+                onClick={() => {
+                  console.log(result);
+                }}
+              >
+                Retry
+              </SecondaryButton>
+              <PrimaryButton onClick={onSave}>Save</PrimaryButton>
             </ButtonContainer>
           </ResponseSection>
         )}
@@ -180,35 +195,6 @@ const Input = styled.input`
   }
 `;
 
-const BaseButton = styled.button`
-  color: white;
-  padding: 12px 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-
-  &:hover {
-    background-color: #c33d16; /* Darker shade */
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
-`;
-
-const SubmitButton = styled(BaseButton)`
-  width: 100%;
-  background-color: #e44d26;
-`;
-
-const ConfirmButton = styled(BaseButton)`
-  background-color: #e44d26;
-  padding: 10px 20px;
-`;
-
 const LoadingContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -272,11 +258,70 @@ const Value = styled.span`
   word-break: break-word; /* 긴 단어가 영역을 벗어나는 것을 방지 */
 `;
 
+const buttonTransitions = `
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
+// 1. 폼 제출 버튼을 위한 스타일 (기존 SubmitButton 디자인 유지)
+const SubmitButton = styled.button`
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #e44d26;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  ${buttonTransitions}
+
+  &:hover {
+    background-color: #c33d16;
+  }
+`;
+
+// 2. 결과 화면의 액션 버튼들을 위한 Base 스타일
+const ActionButtonBase = styled.button`
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  ${buttonTransitions}
+`;
+
+// 2-1. Primary 액션 버튼 (Save to Notion)
+const PrimaryButton = styled(ActionButtonBase)`
+  background-color: #e44d26;
+  color: white;
+
+  &:hover {
+    background-color: #c33d16;
+  }
+`;
+
+// 2-2. Secondary 액션 버튼 (Find Another)
+const SecondaryButton = styled(ActionButtonBase)`
+  background-color: #f0f2f5;
+  color: #34495e;
+
+  &:hover {
+    background-color: #e1e5ea;
+  }
+`;
+
+// ... (LoadingContainer, ResponseSection, Header, WordTitle, RowsContainer 등 나머지 스타일은 동일) ...
+
+// 버튼 컨테이너는 이전 제안과 동일하게 gap을 추가합니다.
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
+  gap: 10px; /* 버튼 사이 간격 */
   width: 100%;
-  margin-top: 16px; /* 내용과의 간격 */
-  padding-top: 16px; /* 위쪽 패딩 */
+  margin-top: 16px;
+  padding-top: 16px;
   border-top: 1px solid #f0f2f5;
 `;
