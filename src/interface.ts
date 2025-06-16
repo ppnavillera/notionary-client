@@ -3,6 +3,6 @@ export interface Result {
   definition1: string;
   definition2: string | null;
   example: string;
-  synonyms: string | null;
-  antonyms: string | null;
+  synonyms: string[] | null;
+  antonyms: string[] | null;
 }

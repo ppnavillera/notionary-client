@@ -47,6 +47,7 @@ function App() {
     setStatus("loading");
     try {
       const result = await getDefinition(value);
+      console.log("Fetched result:", result?.data.synonyms);
       setResult(result.data);
       setStatus("success");
     } catch (error) {
@@ -116,13 +117,13 @@ function App() {
               {result.synonyms && (
                 <S.LongRow>
                   <S.Key>Synonyms:</S.Key>
-                  <S.Value>{result.synonyms}</S.Value>
+                  <S.Value>{result.synonyms.join(", ")}</S.Value>
                 </S.LongRow>
               )}
               {result.antonyms && (
                 <S.LongRow>
                   <S.Key>Antonyms:</S.Key>
-                  <S.Value>{result.antonyms}</S.Value>
+                  <S.Value>{result.antonyms.join(",")}</S.Value>
                 </S.LongRow>
               )}
             </S.RowsContainer>
