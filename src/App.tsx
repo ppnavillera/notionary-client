@@ -1,7 +1,8 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import styled from "styled-components";
-import { getWord } from "./api";
+
 import loadingImage from "./assets/loading.gif";
+import { getDefinition } from "./api";
 
 interface Result {
   word: string;
@@ -11,85 +12,36 @@ interface Result {
   synonyms: string | null;
   antonyms: string | null;
 }
+
 function App() {
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState("");
   const [result, setResult] = useState<Result | null>();
 
-  // const onClick = async () => {
-  //   try {
-  //     const [tab] = await chrome.tabs.query({
-  //       active: true,
-  //       currentWindow: true,
-  //     });
-
-  //     // // chrome:// URL인지 확인
-  //     // if (!tab.url || tab.url.startsWith("chrome://")) {
-  //     //   console.error("Cannot modify chrome:// pages");
-  //     //   return;
-  //     // }
-
-  //     console.log("Current tab ID:", tab.id);
-  //     await chrome.scripting.executeScript({
-  //       target: { tabId: tab.id! },
-  //       func: function (color) {
-  //         document.body.style.backgroundColor = color;
-  //         console.log("Changing background color to:", color);
-  //       },
-  //       args: [color],
-  //     });
-  //   } catch (error) {
-  //     console.error("Error executing script:", error);
-  //   }
-  // };
-
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
-    console.log(value);
   };
 
   const onConfirm = () => {
-    setLoading(false);
+    // 부드러운 전환을 위해 상태 초기화를 약간 지연시킬 수 있지만, 여기서는 즉시 실행합니다.
     setResult(null);
     setValue("");
   };
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!value.trim()) return; // 빈 값은 제출하지 않도록 방지
     setLoading(true);
     try {
-      const result = await getWord(value);
-      // const result = {
-      //   data: {
-      //     word: "apple",
-      //     definition1: "a round fruvvvvvvvvvvvvvvvvvit",
-      //     definition2: "the tree ",
-      //     example: "He picked an apple from the tree.",
-      //     synonyms: "fruit, pome",
-      //     antonyms: "hello",
-      //   },
-      // };
-      // await new Promise((resolve) => setTimeout(resolve, 2000));
+      const result = await getDefinition(value);
       setResult(result.data);
     } catch (error) {
       console.error("Error fetching word:", error);
+      // 사용자에게 에러 피드백을 주는 UI를 추가할 수도 있습니다.
+      alert("Could not find the definition for that word.");
     } finally {
       setLoading(false);
     }
-  };
-
-  const renderSynonymsAntonyms = (label: string, items: string) => {
-    return items.length < 20 ? (
-      <Row>
-        <Key>{label}:</Key>
-        <Value>{items}</Value> {/* 문자열 그대로 출력 */}
-      </Row>
-    ) : (
-      <LongRow>
-        <Key>{label}:</Key>
-        <Value>{items}</Value> {/* 문자열 그대로 출력 */}
-      </LongRow>
-    );
   };
 
   return (
@@ -97,73 +49,59 @@ function App() {
       <Container>
         {!loading && !result && (
           <InputSection>
-            <Title>Enter a Word</Title>
+            <Title>Dictionary</Title>
             <Form onSubmit={onSubmit}>
               <Input
                 type="text"
                 value={value}
                 onChange={handleChange}
-                placeholder="Enter word here"
+                placeholder="Enter a word"
               />
-              <SubmitButton>Submit</SubmitButton>
+              <SubmitButton type="submit">Search</SubmitButton>
             </Form>
           </InputSection>
         )}
         {loading && (
-          <img src={loadingImage} alt="Loading" style={{ width: "100px" }} />
+          <LoadingContainer>
+            <img src={loadingImage} alt="Loading" style={{ width: "80px" }} />
+          </LoadingContainer>
         )}
         {!loading && result && (
           <ResponseSection>
-            {/* <Title>Notion Dictionary</Title> */}
-            <Definition>Definition</Definition>
+            <Header>
+              <WordTitle>{result.word}</WordTitle>
+            </Header>
             <RowsContainer>
-              <Row>
-                <Key>Word:</Key>
-                <Value>{result.word}</Value>
-              </Row>
-              <Row>
+              <LongRow>
                 <Key>Definition 1:</Key>
                 <Value>{result.definition1}</Value>
-              </Row>
-              <Row>
-                <Key>Definition 2:</Key>
-                <Value>{result.definition2}</Value>
-              </Row>
+              </LongRow>
+              {result.definition2 && (
+                <LongRow>
+                  <Key>Definition 2:</Key>
+                  <Value>{result.definition2}</Value>
+                </LongRow>
+              )}
               <LongRow>
                 <Key>Example:</Key>
                 <Value>{result.example}</Value>
               </LongRow>
-
-              {result.synonyms &&
-                renderSynonymsAntonyms("Synonyms", result.synonyms)}
-              {result.antonyms &&
-                renderSynonymsAntonyms("Antonyms", result.antonyms)}
-              {/* {result.synonyms?.length !== undefined &&
-              result.synonyms.length < 20 ? (
-                <Row>
-                  <Key>Synonyms:</Key>
-                  <Value>{result.synonyms}</Value>
-                </Row>
-              ) : (
+              {result.synonyms && (
                 <LongRow>
                   <Key>Synonyms:</Key>
                   <Value>{result.synonyms}</Value>
                 </LongRow>
               )}
-              {result.antonyms?.length !== undefined &&
-              result.antonyms.length < 20 ? (
-                <Row>
-                  <Key>Antonyms:</Key>
-                  <Value>{result.antonyms}</Value>
-                </Row>
-              ) : (
+              {result.antonyms && (
                 <LongRow>
                   <Key>Antonyms:</Key>
                   <Value>{result.antonyms}</Value>
                 </LongRow>
-              )} */}
+              )}
             </RowsContainer>
-            <ConfirmButton onClick={onConfirm}>Confirm</ConfirmButton>
+            <ButtonContainer>
+              <ConfirmButton onClick={onConfirm}>Search Another</ConfirmButton>
+            </ButtonContainer>
           </ResponseSection>
         )}
       </Container>
@@ -173,18 +111,17 @@ function App() {
 
 export default App;
 
+// --- Styled Components (디자인 개선) ---
+
 const Body = styled.div`
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #f9f5f0;
-  /* min-width: 50vh;
-height: 100vh; */
-  /* width: 100%; */
+  background-color: #f4f7f9;
   width: 300px;
-  /* height: auto; */
   height: 400px;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
 `;
 
 const Container = styled.div`
@@ -192,140 +129,154 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* min-width: 200px; */
-  width: 80%;
-  max-width: 600px;
-  /* padding: 40px 50px; */
-  padding: 20px;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
   background-color: white;
-  /* border-radius: 10px;
-box-shadow: 0px 1px 5px 0 rgba(0, 0, 0, 0.5); */
-  border-radius: 15px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.07);
+  box-sizing: border-box;
 `;
 
 const InputSection = styled.div`
-  gap: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px 5px;
   width: 100%;
-  min-height: 200px;
+  gap: 24px;
 `;
 
-const Title = styled.div`
-  margin: 0px;
-  /* text-align: center; */
-  /* font-size: 32px; */
-  font-size: 26px;
-  color: #e44d26;
-  font-family: "Pretendard";
-  font-weight: 700;
-  /* text-shadow: 1px 1px 1px rgba(185, 176, 176, 0.5); */
+const Title = styled.h1`
+  margin: 0;
+  font-size: 28px;
+  color: #2c3e50;
+  font-weight: 800;
 `;
 
 const Form = styled.form`
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
-  /* margin-top: 20px; */
-  gap: 15px;
   width: 100%;
+  gap: 12px;
 `;
 
 const Input = styled.input`
-  padding: 10px 16px;
-  /* width: 70%; */
-  /* flex: 0 0 70%; */
-  border: 2px solid #ddd;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #dcdfe6;
   border-radius: 8px;
   font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  &::placeholder {
+    color: #a8b0c3;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #e44d26;
+    box-shadow: 0 0 0 3px rgba(228, 77, 38, 0.1);
+  }
 `;
 
-const SubmitButton = styled.button`
-  background-color: #e44d26;
+const BaseButton = styled.button`
   color: white;
-  padding: 10px 16px;
+  padding: 12px 16px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+
+  &:hover {
+    background-color: #c33d16; /* Darker shade */
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
 `;
 
-const ConfirmButton = styled.button`
+const SubmitButton = styled(BaseButton)`
+  width: 100%;
   background-color: #e44d26;
-  color: white;
-  padding: 8px 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 12px;
 `;
 
-// const LoadingContainer = styled.div`
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   height: 100vh;
-//   background-color: rgba(0, 0, 0, 0.5);
-//   width: 100%;
-// `;
+const ConfirmButton = styled(BaseButton)`
+  background-color: #e44d26;
+  padding: 10px 20px;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+`;
 
 const ResponseSection = styled.div`
-  /* display: none; */
-  /* text-align: left;
-margin-top: 30px; */
-  width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: start;
-`;
-const Definition = styled.div`
-  color: #e44d26;
-  font-size: 22px;
-  font-family: "Pretendard";
-  font-weight: 700;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #e44d26;
   width: 100%;
+  height: 100%;
+  text-align: left;
+`;
+
+const Header = styled.div`
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f2f5;
+  margin-bottom: 16px;
+`;
+
+const WordTitle = styled.h2`
+  margin: 0;
+  color: #e44d26;
+  font-size: 24px;
+  font-weight: 700;
+  text-transform: capitalize;
 `;
 
 const RowsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  /* gap: 1em; */
-  padding-top: 15px;
-  padding-bottom: 25px;
-  width: 100%;
+  gap: 18px;
+  flex-grow: 1; /* 컨텐츠가 남는 공간을 모두 차지하도록 */
+  overflow-y: auto; /* 내용이 많으면 스크롤 */
+  padding-right: 8px; /* 스크롤바 공간 확보 */
 `;
 
 const Row = styled.div`
   display: flex;
-  /* justify-content: center; */
-  align-items: center;
-  font-family: "Pretendard";
   gap: 8px;
+  font-size: 14px;
 `;
 
 const LongRow = styled(Row)`
   flex-direction: column;
-  gap: 4px;
-  align-items: start;
+  gap: 6px;
+  align-items: flex-start;
 `;
 
 const Key = styled.span`
-  font-size: 14px;
-  font-weight: 700;
-  /* font-weight: bold; */
-  color: #555;
+  font-weight: 600;
+  color: #34495e;
   flex-shrink: 0;
 `;
+
 const Value = styled.span`
-  font-size: 14px;
-  /* font-weight: 400; */
+  color: #555;
+  line-height: 1.6;
+  word-break: break-word; /* 긴 단어가 영역을 벗어나는 것을 방지 */
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 16px; /* 내용과의 간격 */
+  padding-top: 16px; /* 위쪽 패딩 */
+  border-top: 1px solid #f0f2f5;
 `;
