@@ -53,8 +53,8 @@ export async function saveToNotion(definition: Result) {
       }
     );
 
-    // console.log(response.data);
-    return response.data;
+    console.log(response.data.data.url);
+    return response.data.data.url;
     // return;
   } catch (err) {
     if (axios.isAxiosError(err)) {
