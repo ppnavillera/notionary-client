@@ -116,8 +116,13 @@ function App() {
               </S.LongRow>
               {result.synonyms && (
                 <S.LongRow>
-                  <S.Key>Synonyms:</S.Key>
-                  <S.Value>{result.synonyms.join(", ")}</S.Value>
+                  <S.Key>Synonyms:</S.Key>{" "}
+                  {/* 각 동의어를 Tag로 만들기 위해 컨테이너와 map 함수 사용 */}
+                  <S.TagContainer>
+                    {result.synonyms.map((synonym) => (
+                      <S.Tag key={synonym}>{synonym}</S.Tag>
+                    ))}
+                  </S.TagContainer>
                 </S.LongRow>
               )}
               {result.antonyms && (
@@ -128,8 +133,18 @@ function App() {
               )}
             </S.RowsContainer>
             <S.ButtonContainer>
-              <S.SecondaryButton onClick={handleRetry}>Retry</S.SecondaryButton>
-              <S.PrimaryButton onClick={onSave}>Save</S.PrimaryButton>
+              {/* 왼쪽 (Tertiary Action) */}
+              <S.GhostButton onClick={() => setStatus("idle")}>
+                Home
+              </S.GhostButton>
+
+              {/* 오른쪽 (Primary/Secondary Actions) */}
+              <S.ActionGroup>
+                <S.SecondaryButton onClick={handleRetry}>
+                  Retry
+                </S.SecondaryButton>
+                <S.PrimaryButton onClick={onSave}>Save</S.PrimaryButton>
+              </S.ActionGroup>
             </S.ButtonContainer>
           </S.ResponseSection>
         )}

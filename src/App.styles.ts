@@ -135,6 +135,22 @@ export const Value = styled.span`
   line-height: 1.6;
   word-break: break-word;
 `;
+export const TagContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap; /* 태그가 많으면 다음 줄로 넘어감 */
+  gap: 8px; /* 태그 사이의 간격 */
+  width: 100%;
+`;
+
+export const Tag = styled.span`
+  background-color: #f0f2f5; /* 부드러운 배경색 */
+  color: #555;
+  padding: 4px 10px;
+  border-radius: 12px; /* 둥근 모서리 (알약 모양) */
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap; /* 태그 내용은 줄바꿈되지 않도록 */
+`;
 
 // --- 저장 완료 화면 (saved) ---
 export const SuccessContainer = styled.div`
@@ -262,10 +278,26 @@ export const SecondaryButton = styled(ActionButtonBase)`
   }
 `;
 
+export const GhostButton = styled(ActionButtonBase)`
+  background: transparent;
+  color: #555e68; // 약간 톤 다운된 텍스트 색상
+
+  &:hover {
+    background-color: #f0f2f5; // Secondary 버튼의 기본 배경색과 동일
+  }
+`;
+
+// 오른쪽 버튼 그룹을 위한 컨테이너 (새로 추가)
+export const ActionGroup = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+// ButtonContainer 스타일 수정
 export const ButtonContainer = styled.div`
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  justify-content: space-between; // 양쪽 끝으로 요소를 분리
+  align-items: center; // 세로 중앙 정렬
   width: 100%;
   margin-top: 16px;
   padding-top: 16px;
