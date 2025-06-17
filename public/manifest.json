@@ -6,8 +6,29 @@
   "action": {
     "default_popup": "index.html"
   },
-  "permissions": ["scripting", "activeTab"],
+  "permissions": [
+    "scripting",
+    "activeTab",
+    "contextMenus",
+    "identity",
+    "storage",
+    "tabs"
+  ],
+  "oauth2": {
+    "client_id": "963210109986-up7pltqkclkljv7lf5d64n4086j379gd.apps.googleusercontent.com",
+    "scopes": ["openid", "email", "profile"]
+  },
+  "icons": {
+    "16": "16.png",
+    "48": "48.png",
+    "128": "128.png"
+  },
   "host_permissions": ["http://*/*", "https://*/*"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+
   "web_accessible_resources": [
     {
       "resources": ["loading.json"],

@@ -1,5 +1,9 @@
+// src/api.ts
+
 import axios from "axios";
 import { Result } from "./interface";
+import { supabase } from "./supabaseClient";
+import { AuthError, Session, User } from "@supabase/supabase-js";
 
 const url = "http://127.0.0.1:54321/functions/v1/";
 // "https://nxogwwumniauclwarsbt.supabase.co/functions/v1/enkoextension";
@@ -63,4 +67,10 @@ export async function saveToNotion(definition: Result) {
       console.error(err);
     }
   }
+}
+// getDefinition, saveToNotion 함수는 그대로 둡니다.
+
+// 로그아웃은 그대로 유지합니다.
+export async function signOut() {
+  await supabase.auth.signOut();
 }
