@@ -41,38 +41,59 @@ function App() {
     }
   }, []);
 
+  // useEffect(() => {
+  //   console.log("[EFFECT-1] useEffect 실행됨 (팝업 열림)");
+  //   setLoading(true);
+
+  //   const checkSession = async () => {
+  //     console.log("[EFFECT-2] 스토리지에서 세션 가져오기 시도...");
+  //     const result = await chrome.storage.local.get("session");
+
+  //     if (result && result.session) {
+  //       console.log("[EFFECT-3] 스토리지에서 세션 발견!", result.session);
+  //       await supabase.auth.setSession(result.session);
+  //     } else {
+  //       console.log("[EFFECT-3] 스토리지에 저장된 세션 없음.");
+  //     }
+  //     setLoading(false);
+  //   };
+
+  //   checkSession();
+
+  //   const {
+  //     data: { subscription },
+  //   } = supabase.auth.onAuthStateChange((_event, session) => {
+  //     console.log(
+  //       `[AUTH-CHANGE] onAuthStateChange 이벤트 발생: ${_event}`,
+  //       session
+  //     );
+  //     setUser(session?.user ?? null);
+  //   });
+
+  //   return () => {
+  //     subscription.unsubscribe();
+  //   };
+  // }, []);
   useEffect(() => {
-    console.log("[EFFECT-1] useEffect 실행됨 (팝업 열림)");
-    setLoading(true);
-
     const checkSession = async () => {
-      console.log("[EFFECT-2] 스토리지에서 세션 가져오기 시도...");
-      const result = await chrome.storage.local.get("session");
-
-      if (result && result.session) {
-        console.log("[EFFECT-3] 스토리지에서 세션 발견!", result.session);
-        await supabase.auth.setSession(result.session);
-      } else {
-        console.log("[EFFECT-3] 스토리지에 저장된 세션 없음.");
+      const { session } = await chrome.storage.local.get("session");
+      if (session) {
+        await supabase.auth.setSession(session);
+        setUser(session.user); // user 상태도 설정
       }
       setLoading(false);
     };
 
     checkSession();
 
+    // auth state 변경 감지
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log(
-        `[AUTH-CHANGE] onAuthStateChange 이벤트 발생: ${_event}`,
-        session
-      );
       setUser(session?.user ?? null);
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleLogout = async () => {
@@ -81,12 +102,20 @@ function App() {
     console.log("[LOGOUT-2] 스토리지에서 세션 삭제 시도...");
     await chrome.storage.local.remove("session");
     console.log("[LOGOUT-3] 스토리지에서 세션 삭제 완료");
+
+    // popup 비활성화 - 빈 문자열로 설정
+    await chrome.action.setPopup({ popup: "" });
+    console.log("[LOGOUT-4] Popup 비활성화 완료");
+
     setUser(null);
+
+    // popup 창 닫기
+    window.close();
   };
-  const handleLogin = () => {
-    // 이제 그냥 백그라운드에 메시지만 보냅니다.
-    chrome.runtime.sendMessage({ action: "login" });
-  };
+  // const handleLogin = () => {
+  //   // 이제 그냥 백그라운드에 메시지만 보냅니다.
+  //   chrome.runtime.sendMessage({ action: "login" });
+  // };
 
   if (loading) {
     return <div>로딩 중...</div>;
@@ -128,9 +157,11 @@ function App() {
   const handleRetry = () => {
     performSearch(value);
   };
-  const renderLoginButton = () => (
+  // 로그인 버튼 렌더링 부분 수정
+  const renderNotLoggedIn = () => (
     <S.Container>
-      <S.PrimaryButton onClick={handleLogin}>Login with Google</S.PrimaryButton>
+      <S.Title>Notionary</S.Title>
+      <p>Extension 아이콘을 클릭하여 로그인하세요</p>
     </S.Container>
   );
 
@@ -244,7 +275,8 @@ function App() {
     </S.Container>
   );
 
-  return <S.Body>{!user ? renderLoginButton() : main()}</S.Body>;
+  // return 부분 수정
+  return <S.Body>{!user ? renderNotLoggedIn() : main()}</S.Body>;
 }
 
 export default App;
