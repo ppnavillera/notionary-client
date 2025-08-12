@@ -100,7 +100,7 @@ function App() {
     console.log("[LOGOUT-1] 로그아웃 시작");
     await signOut();
     console.log("[LOGOUT-2] 스토리지에서 세션 삭제 시도...");
-    await chrome.storage.local.remove("session");
+    await chrome.storage.local.remove(["session", "notionSetup"]); // notionSetup도 제거
     console.log("[LOGOUT-3] 스토리지에서 세션 삭제 완료");
 
     // popup 비활성화 - 빈 문자열로 설정
@@ -167,6 +167,21 @@ function App() {
 
   const main = () => (
     <S.Container>
+      <S.LogoutButton onClick={handleLogout} title="Logout">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+          />
+        </svg>
+      </S.LogoutButton>
       {status === "idle" && (
         <S.InputSection>
           <S.Title>Notionary</S.Title>
@@ -179,7 +194,6 @@ function App() {
             />
             <S.SubmitButton type="submit">Search</S.SubmitButton>
           </S.Form>
-          <button onClick={handleLogout}>logout</button>
         </S.InputSection>
       )}
 
@@ -193,6 +207,7 @@ function App() {
         <S.ResponseSection>
           <S.Header>
             <S.WordTitle>{result.word}</S.WordTitle>
+            <S.Pronunciation>{result.pronunciation}</S.Pronunciation>
           </S.Header>
           <S.RowsContainer>
             <S.LongRow>
@@ -223,7 +238,11 @@ function App() {
             {result.antonyms && (
               <S.LongRow>
                 <S.Key>Antonyms:</S.Key>
-                <S.Value>{result.antonyms.join(",")}</S.Value>
+                <S.TagContainer>
+                  {result.antonyms.map((antonym) => (
+                    <S.Tag key={antonym}>{antonym}</S.Tag>
+                  ))}
+                </S.TagContainer>
               </S.LongRow>
             )}
           </S.RowsContainer>
