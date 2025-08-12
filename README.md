@@ -124,19 +124,9 @@ src/
 - 한국어-영어 뿐만 아니라 다양한 언어 쌍 지원
 - 언어별 발음 가이드 제공
 
-## 🤝 기여하기
+## 📝 개인 프로젝트
 
-이 프로젝트는 언어 학습을 더욱 효율적으로 만들기 위한 오픈소스 프로젝트입니다. 기여를 원하시는 분은 다음 절차를 따라주세요:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 라이센스
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+이 프로젝트는 개인 학습과 개발 목적으로 만들어진 프로젝트입니다.
 
 ## 🔗 관련 링크
 
