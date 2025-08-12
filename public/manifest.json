@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Notionary",
   "version": "1.0.0",
-  "description": "",
+  "description": "Chrome extension for looking up English word definitions and saving them to Notion",
   "action": {},
   "permissions": [
     "scripting",
