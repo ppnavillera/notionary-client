@@ -15,6 +15,7 @@ export const Body = styled.div`
 `;
 
 export const Container = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -42,6 +43,37 @@ export const Title = styled.h1`
   font-size: 28px;
   color: #2c3e50;
   font-weight: 800;
+`;
+
+export const LogoutButton = styled.button`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+  
+  &:hover {
+    background-color: #f0f2f5;
+    color: #e44d26;
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  svg {
+    width: 18px;
+    height: 18px;
+  }
 `;
 
 export const Form = styled.form`
@@ -101,6 +133,14 @@ export const WordTitle = styled.h2`
   font-size: 24px;
   font-weight: 700;
   text-transform: capitalize;
+`;
+
+export const Pronunciation = styled.div`
+  margin: 4px 0 0 0;
+  color: #666;
+  font-size: 16px;
+  font-style: italic;
+  font-family: 'Charis SIL', 'DejaVu Sans', monospace;
 `;
 
 export const RowsContainer = styled.div`
